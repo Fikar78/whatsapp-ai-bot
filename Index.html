@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toko Lagu MP3 & Digital Store</title>
+    <style>
+        /* Base Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding-bottom: 120px;
+            min-height: 100vh;
+        }
+
+        /* Top Header Navigation */
+        header {
+            background-color: #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid #334155;
+        }
+
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #22c55e;
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            fill: #22c55e;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 16px;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-top: 1px solid #334155;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background-color: #22c55e;
+            color: #0f172a;
+        }
+
+        .cart-badge {
+            background-color: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* Container Main */
+        main {
+            max-width: 1000px;
+            margin: 16px auto;
+            padding: 0 16px;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Banner Search & Filter */
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: #94a3b8;
+        }
+
+        .genre-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            padding-bottom: 6px;
+        }
+
+        .genre-btn {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .genre-btn.active {
+            border-color: #22c55e;
+            color: #22c55e;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+
+        /* Songs Grid */
+        .songs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .song-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .song-card:active {
+            transform: scale(0.98);
+        }
+
+        .cover-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #334155;
+            margin-bottom: 10px;
+        }
+
+        .cover-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: #22c55e;
+            color: #0f172a;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .play-overlay-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #0f172a;
+        }
+
+        .song-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f8fafc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .song-artist {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 8px;
+        }
+
+        .song-price {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            padding: 8px;
+            background-color: rgba(34, 197, 94, 0.15);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Forms & Inputs */
+        .form-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: #22c55e;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Admin Table List */
+        .admin-song-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+            gap: 10px;
+        }
+
+        .admin-song-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .admin-song-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        /* Bottom Sticky Player */
+        .audio-player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1e293b;
+            border-top: 1px solid #334155;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .player-cover {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            background-color: #334155;
+        }
+
+        .player-text {
+            overflow: hidden;
+        }
+
+        .player-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-artist {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-play-pause {
+            background-color: #22c55e;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn-play-pause svg {
+            width: 20px;
+            height: 20px;
+            fill: #0f172a;
+        }
+
+        /* Toast Popup Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: #22c55e;
+            color: #0f172a;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Cart Item Card */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1e293b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #334155;
+        }
+
+        /* Request Item List */
+        .request-card {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showPage('katalog')">
+                <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                <span>FLM & MP3 STORE</span>
+            </a>
+        </div>
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-katalog" onclick="showPage('katalog')">🎵 Katalog</button>
+            <button class="tab-btn" id="tab-request" onclick="showPage('request')">✍️ Request Lagu</button>
+            <button class="tab-btn" id="tab-keranjang" onclick="showPage('keranjang')">
+                🛒 Keranjang <span class="cart-badge" id="cartCount">0</span>
+            </button>
+            <button class="tab-btn" id="tab-admin" onclick="showPage('admin')">🔐 Panel Admin</button>
+        </div>
+    </header>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">Pesan Notifikasi</div>
+
+    <main>
+        <!-- PAGE 1: KATALOG LAGU -->
+        <section id="page-katalog" class="page-section active">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="searchInput" placeholder="Cari judul lagu, FLM, atau penyanyi..." oninput="filterSongs()">
+            </div>
+
+            <div class="genre-list" id="genreContainer">
+                <button class="genre-btn active" onclick="setGenreFilter('semua', this)">Semua Genre</button>
+                <button class="genre-btn" onclick="setGenreFilter('FLM Project', this)">FLM Project</button>
+                <button class="genre-btn" onclick="setGenreFilter('DJ Remix', this)">DJ Remix</button>
+                <button class="genre-btn" onclick="setGenreFilter('Pop / Slow', this)">Pop / Slow</button>
+                <button class="genre-btn" onclick="setGenreFilter('Dangdut', this)">Dangdut</button>
+            </div>
+
+            <div class="songs-grid" id="songsGrid">
+                <!-- Grid item lagu di-render via JS -->
+            </div>
+        </section>
+
+        <!-- PAGE 2: REQUEST LAGU -->
+        <section id="page-request" class="page-section">
+            <div class="form-card">
+                <h3 style="margin-bottom: 12px; color:#22c55e;">Form Request / Minta Lagu</h3>
+                <p style="font-size: 0.85rem; color:#94a3b8; margin-bottom: 16px;">
+                    Lagu atau file FLM yang kamu cari belum ada? Tuliskan detailnya di bawah ini!
+                </p>
+                <form id="requestForm" onsubmit="handleSendRequest(event)">
+                    <div class="form-group">
+                        <label>Nama Kamu</label>
+                        <input type="text" id="reqName" placeholder="Masukkan nama kamu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Judul Lagu / Project FLM</label>
+                        <input type="text" id="reqTitle" placeholder="Contoh: DJ Komang Remix FLM" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Penyanyi / DJ</label>
+                        <input type="text" id="reqArtist" placeholder="Contoh: DJ Raim Laode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan Tambahan (Opsional)</label>
+                        <textarea id="reqNote" rows="3" placeholder="Contoh: Butuh sampel MP3 durasi full/pro project"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Kirim Request Lagu</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- PAGE 3: KERANJANG BELANJA -->
+        <section id="page-keranjang" class="page-section">
+            <div class="form-card">
+                <h3 style="margin-bottom: 16px; color:#22c55e;">Keranjang Belanja</h3>
+                <div id="cartList">
+                    <!-- Item keranjang di-render via JS -->
+                </div>
+                
+                <div style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 16px;">
+                        <span>Total Pembelian:</span>
+                        <span id="cartTotal" style="color:#22c55e;">Rp 0</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Pembeli</label>
+                        <input type="text" id="buyerName" placeholder="Masukkan nama kamu" required>
+                    </div>
+
+                    <button class="btn-primary" onclick="checkoutWhatsApp()">
+                        💬 Beli & Kirim Pesanan via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 4: PANEL ADMIN -->
+        <section id="page-admin" class="page-section">
+            <!-- Login View Admin -->
+            <div id="adminLoginView" class="form-card">
+                <h3 style="margin-bottom: 12px; color:#22c55e;">Login Panel Admin</h3>
+                <p style="font-size: 0.8rem; color:#94a3b8; margin-bottom: 14px;">Masukkan password admin untuk mengedit harga dan lagu. (Default: <b>admin123</b>)</p>
+                <div class="form-group">
+                    <label>Password Admin</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Masukkan Password">
+                </div>
+                <button class="btn-primary" onclick="loginAdmin()">Masuk Sebagai Admin</button>
+            </div>
+
+            <!-- Main Dashboard Admin (Tersembunyi Sebelum Login) -->
+            <div id="adminDashboardView" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="color:#22c55e;">Pengaturan Admin Store</h3>
+                    <button class="btn-danger" onclick="logoutAdmin()">Logout</button>
+                </div>
+
+                <!-- Admin Settings Form -->
+                <div class="form-card">
+                    <h4 style="margin-bottom: 12px;">1. Pengaturan Kontak & Password</h4>
+                    <div class="form-group">
+                        <label>Nomor WhatsApp Admin (Awal 62...)</label>
+                        <input type="text" id="adminWaInput" placeholder="Contoh: 628123456789">
+                    </div>
+                    <div class="form-group">
+                        <label>Ubah Password Admin</label>
+                        <input type="text" id="adminNewPassInput" placeholder="Password Baru">
+                    </div>
+                    <button class="btn-primary" onclick="saveAdminSettings()">Simpan Pengaturan</button>
+                </div>
+
+                <!-- Add New Song Form -->
+                <div class="form-card">
+                    <h4 style="margin-bottom: 12px;">2. Tambah / Edit Lagu Baru</h4>
+                    <form id="addSongForm" onsubmit="handleSaveSong(event)">
+                        <input type="hidden" id="editSongId">
+                        <div class="form-group">
+                            <label>Judul Lagu / FLM Project</label>
+                            <input type="text" id="songTitleInput" required placeholder="Judul Lagu">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Penyanyi / DJ</label>
+                            <input type="text" id="songArtistInput" required placeholder="Nama Artis / DJ">
+                        </div>
+                        <div class="form-group">
+                    
